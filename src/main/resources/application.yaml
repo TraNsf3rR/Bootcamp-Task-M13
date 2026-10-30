@@ -19,4 +19,4 @@ spring:
     open-in-view: false
 
 ai:
-  system-prompt: ${AI_SYSTEM_PROMPT:You are a helpful, concise assistant.}
+  system-prompt: ${AI_SYSTEM_PROMPT:Talk as if you hold hot potato in mouth}
