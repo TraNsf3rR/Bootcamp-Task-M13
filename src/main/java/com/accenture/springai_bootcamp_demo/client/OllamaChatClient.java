@@ -1,6 +1,6 @@
 package com.accenture.springai_bootcamp_demo.client;
 
-import com.accenture.springai_bootcamp_demo.config.OpenRouterProperties;
+import com.accenture.springai_bootcamp_demo.config.AiProperties;
 import com.accenture.springai_bootcamp_demo.entity.ChatMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -19,11 +19,11 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class OpenRouterClient {
+public class OllamaChatClient {
     private final ChatClient chatClient;
 
-    public OpenRouterClient(ChatClient.Builder chatClientBuilder,
-                            OpenRouterProperties properties) {
+    public OllamaChatClient(ChatClient.Builder chatClientBuilder,
+                            AiProperties properties) {
         this.chatClient = chatClientBuilder
                 .defaultSystem(properties.systemPrompt())
                 .build();
@@ -41,11 +41,11 @@ public class OpenRouterClient {
                     .messages(toMessages(history))
                     .call()
                     .content();
-        } catch (OpenRouterException ex) {
+        } catch (AiClientException ex) {
             throw ex;
         } catch (RuntimeException ex) {
             log.error("Ollama request failed", ex);
-            throw new OpenRouterException("Failed to reach Ollama: " + ex.getMessage(), ex);
+            throw new AiClientException("Failed to reach Ollama: " + ex.getMessage(), ex);
         }
     }
 
@@ -65,7 +65,7 @@ public class OpenRouterClient {
 
     private String extractContent(String content) {
         if (!StringUtils.hasText(content)) {
-            throw new OpenRouterException("Ollama returned an empty response");
+            throw new AiClientException("Ollama returned an empty response");
         }
         return content.trim();
     }

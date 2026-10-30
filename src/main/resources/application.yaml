@@ -18,5 +18,5 @@ spring:
         dialect: org.hibernate.community.dialect.SQLiteDialect
     open-in-view: false
 
-openrouter:
+ai:
   system-prompt: ${AI_SYSTEM_PROMPT:You are a helpful, concise assistant.}
