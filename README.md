@@ -59,6 +59,19 @@ curl.exe -X POST "http://localhost:8080/api/chats/CHAT_ID/chatMessages" `
 The response contains the conversation, including the user message and the
 assistant's reply.
 
+### Summarize a conversation
+
+For a chat that already has messages, request an on-demand summary without
+adding it to the saved conversation history:
+
+```powershell
+curl.exe -X POST "http://localhost:8080/api/chats/CHAT_ID/summary"
+```
+
+Replace `CHAT_ID` with the id returned when creating the chat. The response
+contains `chatId` and `summary`. An empty chat returns HTTP 400; an unknown chat
+returns HTTP 404.
+
 ## Tests
 
 Run the test suite with:

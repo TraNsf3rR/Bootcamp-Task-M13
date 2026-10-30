@@ -3,6 +3,7 @@ package com.accenture.springai_bootcamp_demo.client;
 import com.accenture.springai_bootcamp_demo.config.AiProperties;
 import com.accenture.springai_bootcamp_demo.entity.ChatMessage;
 import com.accenture.springai_bootcamp_demo.entity.Role;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,6 +95,26 @@ class OllamaChatClientTests {
                 () -> ollamaChatClient.complete(List.of(ChatMessage.of(Role.USER, "question"))));
 
         assertEquals("Ollama returned an empty response", exception.getMessage());
+    }
+
+    @Test
+    void summarizesHistoryWithATemporaryInstruction() {
+        when(responseSpec.content()).thenReturn("Summary.");
+        List<ChatMessage> history = new ArrayList<>(List.of(
+                ChatMessage.of(Role.USER, "We decided on a June 1 deadline."),
+                ChatMessage.of(Role.ASSISTANT, "Noted.")));
+
+        String summary = ollamaChatClient.summarize(history);
+
+        assertEquals("Summary.", summary);
+        assertEquals(2, history.size());
+        verify(requestSpec).messages(messagesCaptor.capture());
+        List<Message> messages = messagesCaptor.getValue();
+        assertEquals(3, messages.size());
+        assertEquals("We decided on a June 1 deadline.", messages.get(0).getText());
+        assertEquals("Noted.", messages.get(1).getText());
+        assertInstanceOf(UserMessage.class, messages.get(2));
+        assertTrue(messages.get(2).getText().contains("Include only details explicitly stated"));
     }
 
     @Test
