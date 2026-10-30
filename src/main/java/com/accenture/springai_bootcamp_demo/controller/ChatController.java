@@ -1,6 +1,7 @@
 package com.accenture.springai_bootcamp_demo.controller;
 
 import com.accenture.springai_bootcamp_demo.dto.ChatDto;
+import com.accenture.springai_bootcamp_demo.dto.ChatSummaryResponse;
 import com.accenture.springai_bootcamp_demo.dto.ChatSummaryDto;
 import com.accenture.springai_bootcamp_demo.dto.CreateChatRequest;
 import com.accenture.springai_bootcamp_demo.dto.SendMessageRequest;
@@ -44,6 +45,11 @@ public class ChatController {
     @GetMapping("/{chatId}")
     public ChatDto get(@PathVariable String chatId) {
         return chatService.getChat(chatId);
+    }
+
+    @PostMapping("/{chatId}/summary")
+    public ChatSummaryResponse summarize(@PathVariable String chatId) {
+        return chatService.summarizeChat(chatId);
     }
 
     @DeleteMapping("/{chatId}")

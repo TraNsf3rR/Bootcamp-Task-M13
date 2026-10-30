@@ -11,6 +11,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,6 +21,12 @@ import java.util.List;
 @Slf4j
 @Component
 public class OllamaChatClient {
+    private static final String SUMMARY_INSTRUCTION =
+            "Summarize the conversation above in 3-5 concise bullet points using an ASCII hyphen (-). "
+                    + "Include only details explicitly stated in the conversation. "
+                    + "Distinguish user-stated facts or decisions from assistant suggestions. "
+                    + "Do not infer missing details or add recommendations.";
+
     private final ChatClient chatClient;
 
     public OllamaChatClient(ChatClient.Builder chatClientBuilder,
@@ -30,15 +37,19 @@ public class OllamaChatClient {
     }
 
     public String complete(List<ChatMessage> history) {
-        String reply = call(history);
-
-        return extractContent(reply);
+        return extractContent(call(toMessages(history)));
     }
 
-    private String call(List<ChatMessage> history) {
+    public String summarize(List<ChatMessage> history) {
+        List<Message> promptMessages = new ArrayList<>(toMessages(history));
+        promptMessages.add(new UserMessage(SUMMARY_INSTRUCTION));
+        return extractContent(call(promptMessages));
+    }
+
+    private String call(List<Message> messages) {
         try {
             return chatClient.prompt()
-                    .messages(toMessages(history))
+                    .messages(messages)
                     .call()
                     .content();
         } catch (AiClientException ex) {

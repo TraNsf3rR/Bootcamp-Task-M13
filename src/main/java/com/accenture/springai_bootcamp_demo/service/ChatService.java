@@ -3,6 +3,7 @@ package com.accenture.springai_bootcamp_demo.service;
 import com.accenture.springai_bootcamp_demo.client.OllamaChatClient;
 import com.accenture.springai_bootcamp_demo.dto.ChatDto;
 import com.accenture.springai_bootcamp_demo.dto.ChatSummaryDto;
+import com.accenture.springai_bootcamp_demo.dto.ChatSummaryResponse;
 import com.accenture.springai_bootcamp_demo.dto.CreateChatRequest;
 import com.accenture.springai_bootcamp_demo.dto.SendMessageRequest;
 import com.accenture.springai_bootcamp_demo.entity.Chat;
@@ -46,6 +47,17 @@ public class ChatService {
     @Transactional(readOnly = true)
     public ChatDto getChat(String chatId) {
         return chatMapper.toDto(loadChat(chatId));
+    }
+
+    @Transactional(readOnly = true)
+    public ChatSummaryResponse summarizeChat(String chatId) {
+        Chat chat = loadChat(chatId);
+        if (chat.getChatMessages().isEmpty()) {
+            throw new EmptyChatException(chatId);
+        }
+
+        String summary = ollamaChatClient.summarize(chat.getChatMessages());
+        return new ChatSummaryResponse(chat.getId(), summary);
     }
 
     @Transactional
